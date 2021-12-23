@@ -24,8 +24,9 @@ hs_err_pid*
 /target/
 
 **/.DS_Store
+
+/.classpath
 /.settings/
 /.testadvisor/
+/test-output/
 16*.json
-
-

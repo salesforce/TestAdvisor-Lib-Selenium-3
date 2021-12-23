@@ -219,6 +219,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 
 		Response response = execute(DriverCommand.NEW_SESSION, parameters);
 
+		@SuppressWarnings("unchecked")
 		Map<String, Object> rawCapabilities = (Map<String, Object>) response.getValue();
 		MutableCapabilities returnedCapabilities = new MutableCapabilities();
 		for (Map.Entry<String, Object> entry : rawCapabilities.entrySet()) {
@@ -326,21 +327,21 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		}
 	}
 
-	public List<WebElement> findElements(By by) {
-		eventDispatcher.beforeFindElementByWebDriver(by);
-		List<WebElement> returnedElements = by.findElements(this);
+	public <T extends WebElement> List<T> findElements(By by) {
+		eventDispatcher.beforeFindElementsByWebDriver(by);
+		List<T> returnedElements = by.findElements(this);
 		eventDispatcher.afterFindElementsByWebDriver(returnedElements, by);
 
-		for (WebElement element : returnedElements) {
+		for (T element : returnedElements) {
 			highlightElement(element);
 		}
 
 		return returnedElements;
 	}
 
-	public WebElement findElement(By by) {
+	public <T extends WebElement> T findElement(By by) {
 		eventDispatcher.beforeFindElementByWebDriver(by);
-		WebElement returnedElement = by.findElement(this);
+		T returnedElement = by.findElement(this);
 		eventDispatcher.afterFindElementByWebDriver(returnedElement, by);
 
 		highlightElement(returnedElement);
@@ -348,7 +349,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		return returnedElement;
 	}
 
-	protected WebElement findElement(String by, String using) {
+	protected <T extends WebElement> T findElement(String by, String using) {
 		if (using == null) {
 			throw new IllegalArgumentException("Cannot find elements when the selector is null.");
 		}
@@ -358,9 +359,9 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		if (value == null) { // see https://github.com/SeleniumHQ/selenium/issues/5809
 			throw new NoSuchElementException(String.format("Cannot locate an element using %s=%s", by, using));
 		}
-		WebElement element;
+		T element;
 		try {
-			element = (WebElement) value;
+			element = (T) value;
 		} catch (ClassCastException ex) {
 			throw new WebDriverException("Returned value cannot be converted to WebElement: " + value, ex);
 		}
@@ -369,7 +370,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		return element;
 	}
 
-	protected void setFoundBy(SearchContext context, WebElement element, String by, String using) {
+	protected <T extends WebElement> void setFoundBy(SearchContext context, T element, String by, String using) {
 		if (element instanceof RemoteWebElement) {
 			RemoteWebElement remoteElement = (RemoteWebElement) element;
 			remoteElement.setFoundBy(context, by, using);
@@ -378,7 +379,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 	}
 
 	@SuppressWarnings("unchecked")
-	protected List<WebElement> findElements(String by, String using) {
+	protected <T extends WebElement> List<T> findElements(String by, String using) {
 		if (using == null) {
 			throw new IllegalArgumentException("Cannot find elements when the selector is null.");
 		}
@@ -388,9 +389,9 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		if (value == null) { // see https://github.com/SeleniumHQ/selenium/issues/4555
 			return Collections.emptyList();
 		}
-		List<WebElement> allElements;
+		List<T> allElements;
 		try {
-			allElements = (List<WebElement>) value;
+			allElements = (List<T>) value;
 		} catch (ClassCastException ex) {
 			throw new WebDriverException("Returned value cannot be converted to List<WebElement>: " + value, ex);
 		}
@@ -400,67 +401,67 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		return allElements;
 	}
 
-	public WebElement findElementById(String using) {
+	public <T extends WebElement> T findElementById(String using) {
 		return findElement("id", using);
 	}
 
-	public List<WebElement> findElementsById(String using) {
+	public <T extends WebElement> List<T> findElementsById(String using) {
 		return findElements("id", using);
 	}
 
-	public WebElement findElementByLinkText(String using) {
+	public <T extends WebElement> T findElementByLinkText(String using) {
 		return findElement("link text", using);
 	}
 
-	public List<WebElement> findElementsByLinkText(String using) {
+	public <T extends WebElement> List<T> findElementsByLinkText(String using) {
 		return findElements("link text", using);
 	}
 
-	public WebElement findElementByPartialLinkText(String using) {
+	public <T extends WebElement> T findElementByPartialLinkText(String using) {
 		return findElement("partial link text", using);
 	}
 
-	public List<WebElement> findElementsByPartialLinkText(String using) {
+	public <T extends WebElement> List<T> findElementsByPartialLinkText(String using) {
 		return findElements("partial link text", using);
 	}
 
-	public WebElement findElementByTagName(String using) {
+	public <T extends WebElement> T findElementByTagName(String using) {
 		return findElement("tag name", using);
 	}
 
-	public List<WebElement> findElementsByTagName(String using) {
+	public <T extends WebElement> List<T> findElementsByTagName(String using) {
 		return findElements("tag name", using);
 	}
 
-	public WebElement findElementByName(String using) {
+	public <T extends WebElement> T findElementByName(String using) {
 		return findElement("name", using);
 	}
 
-	public List<WebElement> findElementsByName(String using) {
+	public <T extends WebElement> List<T> findElementsByName(String using) {
 		return findElements("name", using);
 	}
 
-	public WebElement findElementByClassName(String using) {
+	public <T extends WebElement> T findElementByClassName(String using) {
 		return findElement("class name", using);
 	}
 
-	public List<WebElement> findElementsByClassName(String using) {
+	public <T extends WebElement> List<T> findElementsByClassName(String using) {
 		return findElements("class name", using);
 	}
 
-	public WebElement findElementByCssSelector(String using) {
+	public <T extends WebElement> T findElementByCssSelector(String using) {
 		return findElement("css selector", using);
 	}
 
-	public List<WebElement> findElementsByCssSelector(String using) {
+	public <T extends WebElement> List<T> findElementsByCssSelector(String using) {
 		return findElements("css selector", using);
 	}
 
-	public WebElement findElementByXPath(String using) {
+	public <T extends WebElement> T findElementByXPath(String using) {
 		return findElement("xpath", using);
 	}
 
-	public List<WebElement> findElementsByXPath(String using) {
+	public <T extends WebElement> List<T> findElementsByXPath(String using) {
 		return findElements("xpath", using);
 	}
 
@@ -743,14 +744,18 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 
 		public void deleteCookieNamed(String name) {
 			eventDispatcher.beforeDeleteCookieNamed(name);
-			execute(DriverCommand.DELETE_COOKIE, ImmutableMap.of("name", name));
+			innerDeleteNamedCookie(name);
 			eventDispatcher.afterDeleteCookieNamed(name);
 		}
 
 		public void deleteCookie(Cookie cookie) {
 			eventDispatcher.beforeDeleteCookie(cookie);
-			deleteCookieNamed(cookie.getName());
+			innerDeleteNamedCookie(cookie.getName());
 			eventDispatcher.afterDeleteCookie(cookie);
+		}
+		
+		private void innerDeleteNamedCookie(String name) {
+			execute(DriverCommand.DELETE_COOKIE, ImmutableMap.of("name", name));
 		}
 
 		public void deleteAllCookies() {
@@ -890,6 +895,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 
 			@SuppressWarnings({ "unchecked" })
 			public Dimension getSize() {
+				eventDispatcher.beforeGetSizeByWindow();
 				Response response = execute(DriverCommand.GET_CURRENT_WINDOW_SIZE);
 
 				Map<String, Object> rawSize = (Map<String, Object>) response.getValue();
@@ -897,13 +903,16 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 				int width = ((Number) rawSize.get("width")).intValue();
 				int height = ((Number) rawSize.get("height")).intValue();
 
-				return new Dimension(width, height);
+				Dimension dimension = new Dimension(width, height);
+				eventDispatcher.afterGetSizeByWindow(dimension);
+				return dimension;
 			}
 
 			Map<String, Object> rawPoint;
 
 			@SuppressWarnings("unchecked")
 			public Point getPosition() {
+				eventDispatcher.beforeGetPosition();
 				Response response = execute(DriverCommand.GET_CURRENT_WINDOW_POSITION,
 						ImmutableMap.of("windowHandle", "current"));
 				rawPoint = (Map<String, Object>) response.getValue();
@@ -911,15 +920,21 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 				int x = ((Number) rawPoint.get("x")).intValue();
 				int y = ((Number) rawPoint.get("y")).intValue();
 
-				return new Point(x, y);
+				Point point = new Point(x, y);
+				eventDispatcher.afterGetPosition(point);
+				return point;
 			}
 
 			public void maximize() {
+				eventDispatcher.beforeMaximize();
 				execute(DriverCommand.MAXIMIZE_CURRENT_WINDOW);
+				eventDispatcher.afterMaximize();
 			}
 
 			public void fullscreen() {
+				eventDispatcher.beforeFullscreen();
 				execute(DriverCommand.FULLSCREEN_CURRENT_WINDOW);
+				eventDispatcher.afterFullscreen();
 			}
 		}
 	}
@@ -956,7 +971,9 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 	protected class RemoteTargetLocator implements TargetLocator {
 
 		public WebDriver frame(int frameIndex) {
+			eventDispatcher.beforeFrameByIndex(frameIndex);
 			execute(DriverCommand.SWITCH_TO_FRAME, ImmutableMap.of("id", frameIndex));
+			eventDispatcher.afterFrameByIndex(frameIndex);
 			return RemoteWebDriver.this;
 		}
 
@@ -973,20 +990,26 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 			return frame(frameElements.get(0));
 		}
 
-		public WebDriver frame(WebElement frameElement) {
+		public <T extends WebElement> WebDriver frame(T frameElement) {
+			eventDispatcher.beforeFrameByElement(frameElement);
 			Object elementAsJson = new WebElementToJsonConverter().apply(frameElement);
 			execute(DriverCommand.SWITCH_TO_FRAME, ImmutableMap.of("id", elementAsJson));
+			eventDispatcher.afterFrameByElement(frameElement);
 			return RemoteWebDriver.this;
 		}
 
 		public WebDriver parentFrame() {
+			eventDispatcher.beforeParentFrame();
 			execute(DriverCommand.SWITCH_TO_PARENT_FRAME);
+			eventDispatcher.afterParentFrame();
 			return RemoteWebDriver.this;
 		}
 
 		public WebDriver window(String windowHandleOrName) {
 			try {
+				eventDispatcher.beforeWindow(windowHandleOrName);
 				execute(DriverCommand.SWITCH_TO_WINDOW, ImmutableMap.of("handle", windowHandleOrName));
+				eventDispatcher.afterWindow(windowHandleOrName);
 				return RemoteWebDriver.this;
 			} catch (NoSuchWindowException nsw) {
 				// simulate search by name
@@ -994,6 +1017,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 				for (String handle : getWindowHandles()) {
 					switchTo().window(handle);
 					if (windowHandleOrName.equals(executeScript("return window.name"))) {
+						eventDispatcher.afterWindow(windowHandleOrName);
 						return RemoteWebDriver.this; // found by name
 					}
 				}
@@ -1003,15 +1027,20 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		}
 
 		public WebDriver defaultContent() {
+			eventDispatcher.beforeDefaultContent();
 			Map<String, Object> frameId = new HashMap<>();
 			frameId.put("id", null);
 			execute(DriverCommand.SWITCH_TO_FRAME, frameId);
+			eventDispatcher.afterDefaultContent();
 			return RemoteWebDriver.this;
 		}
 
 		public WebElement activeElement() {
+			eventDispatcher.beforeActiveElement();
 			Response response = execute(DriverCommand.GET_ACTIVE_ELEMENT);
-			return (WebElement) response.getValue();
+			WebElement element = (WebElement) response.getValue();
+			eventDispatcher.afterActiveElement(element);
+			return element;
 		}
 
 		public Alert alert() {

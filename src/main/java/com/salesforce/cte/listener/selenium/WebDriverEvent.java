@@ -71,13 +71,10 @@ public class WebDriverEvent {
 		forward(WebDriverInterface.Navigation, "forward"),
 		refresh(WebDriverInterface.Navigation, "refresh"),
 		to(WebDriverInterface.Navigation, "to"),
-		toUrl(WebDriverInterface.Navigation, "to"),
 		// commands called directly from WebDriver.TargetLocator object
 		activeElement(WebDriverInterface.TargetLocator, "activeElement"),
-		alert(WebDriverInterface.TargetLocator, "alert"),
 		defaultContent(WebDriverInterface.TargetLocator, "defaultContent"),
 		frameByIndex(WebDriverInterface.TargetLocator, "frame"),
-		frameByName(WebDriverInterface.TargetLocator, "frame"),
 		frameByElement(WebDriverInterface.TargetLocator, "frame"),
 		parentFrame(WebDriverInterface.TargetLocator, "parentFrame"),
 		window(WebDriverInterface.TargetLocator, "window"),
