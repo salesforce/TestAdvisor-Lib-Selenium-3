@@ -8,7 +8,6 @@
 package com.salesforce.cte.listener.selenium;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,10 +15,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import com.salesforce.cte.listener.selenium.WebDriverEvent.Cmd;
-import com.salesforce.cte.listener.selenium.WebDriverEvent.Type;
-
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.Dimension;
@@ -29,6 +24,9 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Coordinates;
+
+import com.salesforce.cte.listener.selenium.WebDriverEvent.Cmd;
+import com.salesforce.cte.listener.selenium.WebDriverEvent.Type;
 
 /**
  * Entry point for all WebDriver classes augmented by us to fit Test Advisor's needs.
@@ -134,7 +132,7 @@ public class EventDispatcher {
 			listener.beforeFindElementsByWebDriver(event, by);
 	}
 
-	public void afterFindElementsByWebDriver(List<WebElement> elements, By by) {
+	public <T extends WebElement> void afterFindElementsByWebDriver(List<T> elements, By by) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.findElementsByWebDriver);
 		event.setParam1(WebDriverEvent.getLocatorFromBy(by));
 		if (elements.size() > 0) {
@@ -638,21 +636,6 @@ public class EventDispatcher {
 			listener.afterTo(event, url);
 	}
 
-	public void beforeToUrl(URL url) {
-		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.toUrl);
-		event.setParam1(url.toString());
-		currentEvent = event;
-		for (IEventListener listener : eventListeners)
-			listener.beforeToUrl(event, url);
-	}
-
-	public void afterToUrl(URL url) {
-		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.toUrl);
-		event.setParam1(url.toString());
-		for (IEventListener listener : eventListeners)
-			listener.afterToUrl(event, url);
-	}
-
 	public void beforeRefresh() {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.refresh);
 		currentEvent = event;
@@ -679,21 +662,6 @@ public class EventDispatcher {
 		event.setParam1("" + frameIndex);
 		for (IEventListener listener : eventListeners)
 			listener.afterFrameByIndex(event, frameIndex);
-	}
-
-	public void beforeFrameByName(String frameName) {
-		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.frameByName);
-		event.setParam1(frameName);
-		currentEvent = event;
-		for (IEventListener listener : eventListeners)
-			listener.beforeFrameByName(event, frameName);
-	}
-
-	public void afterFrameByName(String frameName) {
-		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.frameByName);
-		event.setParam1(frameName);
-		for (IEventListener listener : eventListeners)
-			listener.afterFrameByName(event, frameName);
 	}
 
 	public void beforeFrameByElement(WebElement frameElement) {
@@ -767,20 +735,6 @@ public class EventDispatcher {
 			listener.afterActiveElement(event, activeElement);
 	}
 
-	public void beforeAlert() {
-		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.alert);
-		currentEvent = event;
-		for (IEventListener listener : eventListeners)
-			listener.beforeAlert(event);
-	}
-
-	public void afterAlert(Alert alert) {
-		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.alert);
-		event.setReturnObject(alert);
-		for (IEventListener listener : eventListeners)
-			listener.afterAlert(event, alert);
-	}
-
 	/* End of methods provided by RemoteTargetLocator */
 
 	/* Begin of methods provided by RemoteAlert class */
@@ -844,7 +798,7 @@ public class EventDispatcher {
 
 	/* Begin of methods provided by RemoteWebElement class */
 	
-	public void beforeClick(WebElement element) {
+	public <T extends WebElement> void beforeClick(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.clickByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -852,14 +806,14 @@ public class EventDispatcher {
 			listener.beforeClick(event, element);
 	}
 
-	public void afterClick(WebElement element) {
+	public <T extends WebElement> void afterClick(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.clickByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		for (IEventListener listener : eventListeners)
 			listener.afterClick(event, element);
 	}
 
-	public void beforeSubmit(WebElement element) {
+	public <T extends WebElement> void beforeSubmit(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.submit);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -867,14 +821,14 @@ public class EventDispatcher {
 			listener.beforeSubmit(event, element);
 	}
 
-	public void afterSubmit(WebElement element) {
+	public <T extends WebElement> void afterSubmit(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.submit);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		for (IEventListener listener : eventListeners)
 			listener.afterSubmit(event, element);
 	}
 
-	public void beforeSendKeysByElement(WebElement element, CharSequence... keysToSend) {
+	public <T extends WebElement> void beforeSendKeysByElement(T element, CharSequence... keysToSend) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.sendKeysByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(maskTextIfPassword(event.getElementLocator(), keysToSend));
@@ -883,7 +837,7 @@ public class EventDispatcher {
 			listener.beforeSendKeysByElement(event, element, keysToSend);
 	}
 
-	public void afterSendKeysByElement(WebElement element, CharSequence... keysToSend) {
+	public <T extends WebElement> void afterSendKeysByElement(T element, CharSequence... keysToSend) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.sendKeysByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(maskTextIfPassword(event.getElementLocator(), keysToSend));
@@ -891,7 +845,7 @@ public class EventDispatcher {
 			listener.afterSendKeysByElement(event, element, keysToSend);
 	}
 
-	public void beforeUploadFile(WebElement element, File localFile) {
+	public <T extends WebElement> void beforeUploadFile(T element, File localFile) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.uploadFile);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(localFile.getPath());
@@ -900,7 +854,7 @@ public class EventDispatcher {
 			listener.beforeUploadFile(event, element, localFile);
 	}
 
-	public void afterUploadFile(WebElement element, File localFile, String response) {
+	public <T extends WebElement> void afterUploadFile(T element, File localFile, String response) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.uploadFile);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(localFile.getPath());
@@ -908,7 +862,7 @@ public class EventDispatcher {
 			listener.afterUploadFile(event, element, localFile, response);
 	}
 
-	public void beforeClear(WebElement element) {
+	public <T extends WebElement> void beforeClear(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.clear);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -916,14 +870,14 @@ public class EventDispatcher {
 			listener.beforeClear(event, element);
 	}
 
-	public void afterClear(WebElement element) {
+	public <T extends WebElement> void afterClear(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.clear);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		for (IEventListener listener : eventListeners)
 			listener.afterClear(event, element);
 	}
 
-	public void beforeGetTagName(WebElement element) {
+	public <T extends WebElement> void beforeGetTagName(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.getTagName);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -931,7 +885,7 @@ public class EventDispatcher {
 			listener.beforeGetTagName(event, element);
 	}
 
-	public void afterGetTagName(String tagName, WebElement element) {
+	public <T extends WebElement> void afterGetTagName(String tagName, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.getTagName);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setReturnValue(tagName);
@@ -939,7 +893,7 @@ public class EventDispatcher {
 			listener.afterGetTagName(event, tagName, element);		
 	}
 
-	public void beforeGetAttribute(String name, WebElement element) {
+	public <T extends WebElement> void beforeGetAttribute(String name, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.getAttribute);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(name);
@@ -948,7 +902,7 @@ public class EventDispatcher {
 			listener.beforeGetAttribute(event, name, element);
 	}
 
-	public void afterGetAttribute(String value, String name, WebElement element) {
+	public <T extends WebElement> void afterGetAttribute(String value, String name, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.getAttribute);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(name);
@@ -957,7 +911,7 @@ public class EventDispatcher {
 			listener.afterGetAttribute(event, value, name, element);		
 	}
 
-	public void beforeIsSelected(WebElement element) {
+	public <T extends WebElement> void beforeIsSelected(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.isSelected);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -965,7 +919,7 @@ public class EventDispatcher {
 			listener.beforeIsSelected(event, element);
 	}
 
-	public void afterIsSelected(boolean isSelected, WebElement element) {
+	public <T extends WebElement> void afterIsSelected(boolean isSelected, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.isSelected);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setReturnValue(Boolean.toString(isSelected));
@@ -973,7 +927,7 @@ public class EventDispatcher {
 			listener.afterIsSelected(event, isSelected, element);		
 	}
 
-	public void beforeIsEnabled(WebElement element) {
+	public <T extends WebElement> void beforeIsEnabled(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.isEnabled);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -981,7 +935,7 @@ public class EventDispatcher {
 			listener.beforeIsEnabled(event, element);
 	}
 
-	public void afterIsEnabled(boolean isEnabled, WebElement element) {
+	public <T extends WebElement> void afterIsEnabled(boolean isEnabled, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.isEnabled);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setReturnValue(Boolean.toString(isEnabled));
@@ -989,7 +943,7 @@ public class EventDispatcher {
 			listener.afterIsEnabled(event, isEnabled, element);		
 	}
 
-	public void beforeGetText(WebElement element) {
+	public <T extends WebElement> void beforeGetText(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.getText);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -997,7 +951,7 @@ public class EventDispatcher {
 			listener.beforeGetText(event, element);
 	}
 
-	public void afterGetText(String text, WebElement element) {
+	public <T extends WebElement> void afterGetText(String text, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.getText);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setReturnValue(text);
@@ -1005,7 +959,7 @@ public class EventDispatcher {
 			listener.afterGetText(event, text, element);		
 	}
 
-	public void beforeGetCssValue(String propertyName, WebElement element) {
+	public <T extends WebElement> void beforeGetCssValue(String propertyName, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.getCssValue);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(propertyName);
@@ -1014,7 +968,7 @@ public class EventDispatcher {
 			listener.beforeGetCssValue(event, propertyName, element);
 	}
 
-	public void afterGetCssValue(String propertyName, String value, WebElement element) {
+	public <T extends WebElement> void afterGetCssValue(String propertyName, String value, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.getCssValue);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(propertyName);
@@ -1023,7 +977,7 @@ public class EventDispatcher {
 			listener.afterGetCssValue(event, propertyName, value, element);		
 	}
 
-	public void beforeFindElementsByElement(By by, WebElement element) {
+	public <T extends WebElement> void beforeFindElementsByElement(By by, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.findElementsByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(WebDriverEvent.getLocatorFromBy(by));
@@ -1032,7 +986,7 @@ public class EventDispatcher {
 			listener.beforeFindElementsByElement(event, by, element);
 	}
 
-	public void afterFindElementsByElement(List<WebElement> elements, By by, WebElement element) {
+	public <T extends WebElement> void afterFindElementsByElement(List<T> elements, By by, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.findElementsByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(WebDriverEvent.getLocatorFromBy(by));
@@ -1048,7 +1002,7 @@ public class EventDispatcher {
 			listener.afterFindElementsByElement(event, elements, by, element);
 	}
 
-	public void beforeFindElementByElement(By by, WebElement element) {
+	public <T extends WebElement> void beforeFindElementByElement(By by, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.findElementByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(WebDriverEvent.getLocatorFromBy(by));
@@ -1057,7 +1011,7 @@ public class EventDispatcher {
 			listener.beforeFindElementByElement(event, by, element);
 	}
 
-	public void afterFindElementByElement(WebElement returnedElement, By by, WebElement element) {
+	public <T extends WebElement> void afterFindElementByElement(WebElement returnedElement, By by, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.findElementByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(WebDriverEvent.getLocatorFromBy(by));
@@ -1067,7 +1021,7 @@ public class EventDispatcher {
 			listener.afterFindElementByElement(event, element, by, element);
 	}
 
-	public void beforeIsDisplayed(WebElement element) {
+	public <T extends WebElement> void beforeIsDisplayed(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.isDisplayed);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -1075,7 +1029,7 @@ public class EventDispatcher {
 			listener.beforeIsDisplayed(event, element);
 	}
 
-	public void afterIsDisplayed(boolean isDisplayed, WebElement element) {
+	public <T extends WebElement> void afterIsDisplayed(boolean isDisplayed, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.isDisplayed);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setReturnValue(Boolean.toString(isDisplayed));
@@ -1083,7 +1037,7 @@ public class EventDispatcher {
 			listener.afterIsDisplayed(event, isDisplayed, element);		
 	}
 
-	public void beforeGetLocation(WebElement element) {
+	public <T extends WebElement> void beforeGetLocation(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.getLocation);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -1091,7 +1045,7 @@ public class EventDispatcher {
 			listener.beforeGetLocation(event, element);
 	}
 
-	public void afterGetLocation(Point point, WebElement element) {
+	public <T extends WebElement> void afterGetLocation(Point point, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.getLocation);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setReturnValue(String.format("x:%d,y:%d", point.x, point.y));
@@ -1100,7 +1054,7 @@ public class EventDispatcher {
 			listener.afterGetLocation(event, point, element);		
 	}
 
-	public void beforeGetSizeByElement(WebElement element) {
+	public <T extends WebElement> void beforeGetSizeByElement(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.getSizeByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -1108,7 +1062,7 @@ public class EventDispatcher {
 			listener.beforeGetSizeByElement(event, element);
 	}
 
-	public void afterGetSizeByElement(Dimension size, WebElement element) {
+	public <T extends WebElement> void afterGetSizeByElement(Dimension size, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.getSizeByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setReturnValue(String.format("h:%d,w:%d", size.height, size.width));
@@ -1117,7 +1071,7 @@ public class EventDispatcher {
 			listener.afterGetSizeByElement(event, size, element);		
 	}
 
-	public void beforeGetRect(WebElement element) {
+	public <T extends WebElement> void beforeGetRect(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.getRect);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -1125,7 +1079,7 @@ public class EventDispatcher {
 			listener.beforeGetRect(event, element);
 	}
 
-	public void afterGetRect(Rectangle rectangle, WebElement element) {
+	public <T extends WebElement> void afterGetRect(Rectangle rectangle, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.getRect);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setReturnValue(String.format("h:%d,w:%d", rectangle.height, rectangle.width));
@@ -1134,7 +1088,7 @@ public class EventDispatcher {
 			listener.afterGetRect(event, rectangle, element);		
 	}
 
-	public void beforeGetCoordinates(WebElement element) {
+	public <T extends WebElement> void beforeGetCoordinates(T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.getCoordinates);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		currentEvent = event;
@@ -1142,7 +1096,7 @@ public class EventDispatcher {
 			listener.beforeGetCoordinates(event, element);
 	}
 
-	public void afterGetCoordinates(Coordinates coordinates, WebElement element) {
+	public <T extends WebElement> void afterGetCoordinates(Coordinates coordinates, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.getCoordinates);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setReturnValue(getCoordinatesAsString(coordinates));
@@ -1151,7 +1105,7 @@ public class EventDispatcher {
 			listener.afterGetCoordinates(event, coordinates, element);		
 	}
 
-	public <X> void beforeGetScreenshotAsByElement(OutputType<X> target, WebElement element) {
+	public <X, T extends WebElement> void beforeGetScreenshotAsByElement(OutputType<X> target, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeGather, eventNumber, Cmd.getScreenshotAsByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(target.toString());
@@ -1160,7 +1114,7 @@ public class EventDispatcher {
 			listener.beforeGetScreenshotAsByElement(event, target, element);
 	}
 
-	public <X> void afterGetScreenshotAsByElement(OutputType<X> target, X screenshot, WebElement element) {
+	public <X, T extends WebElement> void afterGetScreenshotAsByElement(OutputType<X> target, X screenshot, T element) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterGather, eventNumber, Cmd.getScreenshotAsByElement);
 		event.setElementLocator(WebDriverEvent.getLocatorFromWebElement(element));
 		event.setParam1(target.toString());
