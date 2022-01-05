@@ -327,21 +327,21 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		}
 	}
 
-	public <T extends WebElement> List<T> findElements(By by) {
+	public List<WebElement> findElements(By by) {
 		eventDispatcher.beforeFindElementsByWebDriver(by);
-		List<T> returnedElements = by.findElements(this);
+		List<WebElement> returnedElements = by.findElements(this);
 		eventDispatcher.afterFindElementsByWebDriver(returnedElements, by);
 
-		for (T element : returnedElements) {
+		for (WebElement element : returnedElements) {
 			highlightElement(element);
 		}
 
 		return returnedElements;
 	}
 
-	public <T extends WebElement> T findElement(By by) {
+	public WebElement findElement(By by) {
 		eventDispatcher.beforeFindElementByWebDriver(by);
-		T returnedElement = by.findElement(this);
+		WebElement returnedElement = by.findElement(this);
 		eventDispatcher.afterFindElementByWebDriver(returnedElement, by);
 
 		highlightElement(returnedElement);
@@ -349,7 +349,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		return returnedElement;
 	}
 
-	protected <T extends WebElement> T findElement(String by, String using) {
+	protected WebElement findElement(String by, String using) {
 		if (using == null) {
 			throw new IllegalArgumentException("Cannot find elements when the selector is null.");
 		}
@@ -359,9 +359,9 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		if (value == null) { // see https://github.com/SeleniumHQ/selenium/issues/5809
 			throw new NoSuchElementException(String.format("Cannot locate an element using %s=%s", by, using));
 		}
-		T element;
+		WebElement element;
 		try {
-			element = (T) value;
+			element = (WebElement) value;
 		} catch (ClassCastException ex) {
 			throw new WebDriverException("Returned value cannot be converted to WebElement: " + value, ex);
 		}
@@ -370,7 +370,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		return element;
 	}
 
-	protected <T extends WebElement> void setFoundBy(SearchContext context, T element, String by, String using) {
+	protected void setFoundBy(SearchContext context, WebElement element, String by, String using) {
 		if (element instanceof RemoteWebElement) {
 			RemoteWebElement remoteElement = (RemoteWebElement) element;
 			remoteElement.setFoundBy(context, by, using);
@@ -379,7 +379,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 	}
 
 	@SuppressWarnings("unchecked")
-	protected <T extends WebElement> List<T> findElements(String by, String using) {
+	protected List<WebElement> findElements(String by, String using) {
 		if (using == null) {
 			throw new IllegalArgumentException("Cannot find elements when the selector is null.");
 		}
@@ -389,9 +389,9 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		if (value == null) { // see https://github.com/SeleniumHQ/selenium/issues/4555
 			return Collections.emptyList();
 		}
-		List<T> allElements;
+		List<WebElement> allElements;
 		try {
-			allElements = (List<T>) value;
+			allElements = (List<WebElement>) value;
 		} catch (ClassCastException ex) {
 			throw new WebDriverException("Returned value cannot be converted to List<WebElement>: " + value, ex);
 		}
@@ -401,67 +401,67 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		return allElements;
 	}
 
-	public <T extends WebElement> T findElementById(String using) {
+	public WebElement findElementById(String using) {
 		return findElement("id", using);
 	}
 
-	public <T extends WebElement> List<T> findElementsById(String using) {
+	public List<WebElement> findElementsById(String using) {
 		return findElements("id", using);
 	}
 
-	public <T extends WebElement> T findElementByLinkText(String using) {
+	public WebElement findElementByLinkText(String using) {
 		return findElement("link text", using);
 	}
 
-	public <T extends WebElement> List<T> findElementsByLinkText(String using) {
+	public List<WebElement> findElementsByLinkText(String using) {
 		return findElements("link text", using);
 	}
 
-	public <T extends WebElement> T findElementByPartialLinkText(String using) {
+	public WebElement findElementByPartialLinkText(String using) {
 		return findElement("partial link text", using);
 	}
 
-	public <T extends WebElement> List<T> findElementsByPartialLinkText(String using) {
+	public List<WebElement> findElementsByPartialLinkText(String using) {
 		return findElements("partial link text", using);
 	}
 
-	public <T extends WebElement> T findElementByTagName(String using) {
+	public WebElement findElementByTagName(String using) {
 		return findElement("tag name", using);
 	}
 
-	public <T extends WebElement> List<T> findElementsByTagName(String using) {
+	public List<WebElement> findElementsByTagName(String using) {
 		return findElements("tag name", using);
 	}
 
-	public <T extends WebElement> T findElementByName(String using) {
+	public WebElement findElementByName(String using) {
 		return findElement("name", using);
 	}
 
-	public <T extends WebElement> List<T> findElementsByName(String using) {
+	public List<WebElement> findElementsByName(String using) {
 		return findElements("name", using);
 	}
 
-	public <T extends WebElement> T findElementByClassName(String using) {
+	public WebElement findElementByClassName(String using) {
 		return findElement("class name", using);
 	}
 
-	public <T extends WebElement> List<T> findElementsByClassName(String using) {
+	public List<WebElement> findElementsByClassName(String using) {
 		return findElements("class name", using);
 	}
 
-	public <T extends WebElement> T findElementByCssSelector(String using) {
+	public WebElement findElementByCssSelector(String using) {
 		return findElement("css selector", using);
 	}
 
-	public <T extends WebElement> List<T> findElementsByCssSelector(String using) {
+	public List<WebElement> findElementsByCssSelector(String using) {
 		return findElements("css selector", using);
 	}
 
-	public <T extends WebElement> T findElementByXPath(String using) {
+	public WebElement findElementByXPath(String using) {
 		return findElement("xpath", using);
 	}
 
-	public <T extends WebElement> List<T> findElementsByXPath(String using) {
+	public List<WebElement> findElementsByXPath(String using) {
 		return findElements("xpath", using);
 	}
 
@@ -990,7 +990,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 			return frame(frameElements.get(0));
 		}
 
-		public <T extends WebElement> WebDriver frame(T frameElement) {
+		public WebDriver frame(WebElement frameElement) {
 			eventDispatcher.beforeFrameByElement(frameElement);
 			Object elementAsJson = new WebElementToJsonConverter().apply(frameElement);
 			execute(DriverCommand.SWITCH_TO_FRAME, ImmutableMap.of("id", elementAsJson));
