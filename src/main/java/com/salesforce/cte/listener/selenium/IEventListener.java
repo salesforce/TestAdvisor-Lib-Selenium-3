@@ -84,13 +84,11 @@ public interface IEventListener {
 	/**
 	 * Called after {@link WebDriver#findElement WebDriver.findElement(...)}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element returned element
 	 * @param by      locator being used
 	 */
-	<T extends WebElement> void afterFindElementByWebDriver(WebDriverEvent event, T element, By by);
+	void afterFindElementByWebDriver(WebDriverEvent event, WebElement element, By by);
 
 	/**
 	 * Called before {@link WebDriver#findElements WebDriver.findElements(...)}.
@@ -103,13 +101,11 @@ public interface IEventListener {
 	/**
 	 * Called after{@link WebDriver#findElements WebDriver.findElements(...)}.
 	 * 
-	 * @param <T>      WebElement or any type extending WebElement to support
-	 *                 customized WebElement classes
 	 * @param event    event record
 	 * @param elements returned list of elements
 	 * @param by       locator being used
 	 */
-	<T extends WebElement> void afterFindElementsByWebDriver(WebDriverEvent event, List<T> elements, By by);
+	void afterFindElementsByWebDriver(WebDriverEvent event, List<WebElement> elements, By by);
 
 	/**
 	 * Called before {@link org.openqa.selenium.WebDriver#get get(String url)}.
@@ -677,12 +673,10 @@ public interface IEventListener {
 	 * Called after {@link WebDriver.TargetLocator#activeElement()
 	 * TargetLocator.activeElement()}. Not called, if an exception is thrown.
 	 * 
-	 * @param <T>           WebElement or any type extending WebElement to support
-	 *                      customized WebElement classes
 	 * @param event         event record
 	 * @param activeElement the current active WebElement
 	 */
-	<T extends WebElement> void afterActiveElement(WebDriverEvent event, T activeElement);
+	void afterActiveElement(WebDriverEvent event, WebElement activeElement);
 
 	/**
 	 * Called before {@link WebDriver.TargetLocator#defaultContent()
@@ -723,12 +717,10 @@ public interface IEventListener {
 	 * TargetLocator.frame(webElement)} or
 	 * {@link WebDriver.TargetLocator#frame(String) TargetLocator.frame(name)}.
 	 * 
-	 * @param <T>          WebElement or any type extending WebElement to support
-	 *                     customized WebElement classes
 	 * @param event        event record
 	 * @param frameElement element inside frame
 	 */
-	<T extends WebElement> void beforeFrameByElement(WebDriverEvent event, T frameElement);
+	void beforeFrameByElement(WebDriverEvent event, WebElement frameElement);
 
 	/**
 	 * Called after {@link WebDriver.TargetLocator#frame(WebElement)
@@ -736,12 +728,10 @@ public interface IEventListener {
 	 * {@link WebDriver.TargetLocator#frame(String) TargetLocator.frame(name)}. Not
 	 * called, if an exception is thrown.
 	 * 
-	 * @param <T>          WebElement or any type extending WebElement to support
-	 *                     customized WebElement classes
 	 * @param event        event record
 	 * @param frameElement element inside frame
 	 */
-	<T extends WebElement> void afterFrameByElement(WebDriverEvent event, T frameElement);
+	void afterFrameByElement(WebDriverEvent event, WebElement frameElement);
 
 	/**
 	 * Called before {@link WebDriver.TargetLocator#parentFrame()
@@ -954,64 +944,52 @@ public interface IEventListener {
 	/**
 	 * Called before {@link WebElement#click WebElement.click()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeClick(WebDriverEvent event, T element);
+	void beforeClick(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#click WebElement.click()}. Not called, if an
 	 * exception is thrown.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterClick(WebDriverEvent event, T element);
+	void afterClick(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#clear WebElement.clear()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeClear(WebDriverEvent event, T element);
+	void beforeClear(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#clear WebElement.clear()}. Not called, if an
 	 * exception is thrown.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterClear(WebDriverEvent event, T element);
+	void afterClear(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#findElement WebElement.findElement(...)}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param by      locator being used
 	 * @param element use {@link #beforeFindElementByWebDriver(WebDriverEvent, By)
 	 *                beforeFindElement(By, WebDriver)} if a find method of
 	 *                <code>WebDriver</code> is called.
 	 */
-	<T extends WebElement> void beforeFindElementByElement(WebDriverEvent event, By by, T element);
+	void beforeFindElementByElement(WebDriverEvent event, By by, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#findElement WebElement.findElement(...)}. Not
 	 * called, if an exception is thrown.
 	 * 
-	 * @param <T>             WebElement or any type extending WebElement to support
-	 *                        customized WebElement classes
 	 * @param event           event record
 	 * @param returnedElement returned element
 	 * @param by              locator being used
@@ -1020,27 +998,23 @@ public interface IEventListener {
 	 *                        afterFindElement(By, WebDriver)} if a find method of
 	 *                        <code>WebDriver</code> is called.
 	 */
-	<T extends WebElement> void afterFindElementByElement(WebDriverEvent event, T returnedElement, By by, T element);
+	void afterFindElementByElement(WebDriverEvent event, WebElement returnedElement, By by, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#findElements WebElement.findElements(...)}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param by      locator being used
 	 * @param element use {@link #beforeFindElementByWebDriver(WebDriverEvent, By)
 	 *                beforeFindElement(By, WebDriver)} if a find method of
 	 *                <code>WebDriver</code> is called.
 	 */
-	<T extends WebElement> void beforeFindElementsByElement(WebDriverEvent event, By by, T element);
+	void beforeFindElementsByElement(WebDriverEvent event, By by, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#findElements WebElement.findElements(...)}.
 	 * Not called, if an exception is thrown.
 	 * 
-	 * @param <T>              WebElement or any type extending WebElement to
-	 *                         support customized WebElement classes
 	 * @param event            event record
 	 * @param returnedElements returned list of elements
 	 * @param by               locator being used
@@ -1049,357 +1023,295 @@ public interface IEventListener {
 	 *                         afterFindElement(By, WebDriver)} if a find method of
 	 *                         <code>WebDriver</code> is called.
 	 */
-	<T extends WebElement> void afterFindElementsByElement(WebDriverEvent event, List<T> returnedElements, By by,
-			T element);
+	void afterFindElementsByElement(WebDriverEvent event, List<WebElement> returnedElements, By by, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#getAttribute WebElement.getAttribute(...)}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param name    name of the attribute to get
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeGetAttribute(WebDriverEvent event, String name, T element);
+	void beforeGetAttribute(WebDriverEvent event, String name, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#getAttribute WebElement.getAttribute(...)}.
 	 * Not called, if an exception is thrown.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param value   value of the named attribute
 	 * @param name    name of the attribute to get
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterGetAttribute(WebDriverEvent event, String value, String name, T element);
+	void afterGetAttribute(WebDriverEvent event, String value, String name, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#getCssValue WebElement.getCssValue()}.
 	 * 
-	 * @param <T>          WebElement or any type extending WebElement to support
-	 *                     customized WebElement classes
 	 * @param event        event record
 	 * @param propertyName name of the CSS property to get the value of
 	 * @param element      the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeGetCssValue(WebDriverEvent event, String propertyName, T element);
+	void beforeGetCssValue(WebDriverEvent event, String propertyName, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#getCssValue WebElement.getCssValue()}. Not
 	 * called, if an exception is thrown.
 	 * 
-	 * @param <T>          WebElement or any type extending WebElement to support
-	 *                     customized WebElement classes
 	 * @param event        event record
 	 * @param propertyName name of the CSS property to get the value of
 	 * @param value        the retrieved CSS value
 	 * @param element      the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterGetCssValue(WebDriverEvent event, String propertyName, String value, T element);
+	void afterGetCssValue(WebDriverEvent event, String propertyName, String value, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#getTagName WebElement.getTagName()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeGetTagName(WebDriverEvent event, T element);
+	void beforeGetTagName(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#getTagName WebElement.getTagName()}. Not
 	 * called, if an exception is thrown.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param tagName the retrieved tag name
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterGetTagName(WebDriverEvent event, String tagName, T element);
+	void afterGetTagName(WebDriverEvent event, String tagName, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#getText WebElement.getText()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeGetText(WebDriverEvent event, T element);
+	void beforeGetText(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#getText WebElement.getText()}. Not called, if
 	 * an exception is thrown.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param text    the retrieved text
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterGetText(WebDriverEvent event, String text, T element);
+	void afterGetText(WebDriverEvent event, String text, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#isDisplayed WebElement.isDisplayed()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeIsDisplayed(WebDriverEvent event, T element);
+	void beforeIsDisplayed(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#isDisplayed WebElement.isDisplayed()}. Not
 	 * called, if an exception is thrown.
 	 * 
-	 * @param <T>         WebElement or any type extending WebElement to support
-	 *                    customized WebElement classes
 	 * @param event       event record
 	 * @param isDisplayed the retrieved value
 	 * @param element     the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterIsDisplayed(WebDriverEvent event, boolean isDisplayed, T element);
+	void afterIsDisplayed(WebDriverEvent event, boolean isDisplayed, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#isEnabled WebElement.isEnabled()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeIsEnabled(WebDriverEvent event, T element);
+	void beforeIsEnabled(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#isEnabled WebElement.isEnabled()}. Not called,
 	 * if an exception is thrown.
 	 * 
-	 * @param <T>       WebElement or any type extending WebElement to support
-	 *                  customized WebElement classes
 	 * @param event     event record
 	 * @param isEnabled the retrieved value
 	 * @param element   the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterIsEnabled(WebDriverEvent event, boolean isEnabled, T element);
+	void afterIsEnabled(WebDriverEvent event, boolean isEnabled, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#isSelected WebElement.isSelected()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeIsSelected(WebDriverEvent event, T element);
+	void beforeIsSelected(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#isSelected WebElement.isSelected()}. Not
 	 * called, if an exception is thrown.
 	 * 
-	 * @param <T>        WebElement or any type extending WebElement to support
-	 *                   customized WebElement classes
 	 * @param event      event record
 	 * @param isSelected the retrieved value
 	 * @param element    the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterIsSelected(WebDriverEvent event, boolean isSelected, T element);
+	void afterIsSelected(WebDriverEvent event, boolean isSelected, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#getLocation WebElement.getLocation()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeGetLocation(WebDriverEvent event, T element);
+	void beforeGetLocation(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#getLocation WebElement.getLocation()}. Not
 	 * called, if an exception is thrown.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param point   the retrieved point
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterGetLocation(WebDriverEvent event, Point point, T element);
+	void afterGetLocation(WebDriverEvent event, Point point, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#getSize WebElement.getSize()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeGetSizeByElement(WebDriverEvent event, T element);
+	void beforeGetSizeByElement(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#getSize WebElement.getSize()}. Not called, if
 	 * an exception is thrown.
 	 * 
-	 * @param <T>       WebElement or any type extending WebElement to support
-	 *                  customized WebElement classes
 	 * @param event     event record
 	 * @param dimension the retrieved dimension
 	 * @param element   the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterGetSizeByElement(WebDriverEvent event, Dimension dimension, T element);
+	void afterGetSizeByElement(WebDriverEvent event, Dimension dimension, WebElement element);
 
 	/**
 	 * Called before {@link WebElement#getRect WebElement.getRect()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeGetRect(WebDriverEvent event, T element);
+	void beforeGetRect(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#getRect WebElement.getRect()}. Not called, if
 	 * an exception is thrown.
 	 * 
-	 * @param <T>       WebElement or any type extending WebElement to support
-	 *                  customized WebElement classes
 	 * @param event     event record
 	 * @param rectangle the retrieved rectangle
 	 * @param element   the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterGetRect(WebDriverEvent event, Rectangle rectangle, T element);
+	void afterGetRect(WebDriverEvent event, Rectangle rectangle, WebElement element);
 
 	/**
 	 * Called before
 	 * {@link org.openqa.selenium.interactions.Locatable#getCoordinates
 	 * getCoordinates()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeGetCoordinates(WebDriverEvent event, T element);
+	void beforeGetCoordinates(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link org.openqa.selenium.interactions.Locatable#getCoordinates
 	 * getCoordinates()}. Not called, if an exception is thrown.
 	 * 
-	 * @param <T>         WebElement or any type extending WebElement to support
-	 *                    customized WebElement classes
 	 * @param event       event record
 	 * @param coordinates the retrieved coordinates
 	 * @param element     the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterGetCoordinates(WebDriverEvent event, Coordinates coordinates, T element);
+	void afterGetCoordinates(WebDriverEvent event, Coordinates coordinates, WebElement element);
 
 	/**
 	 * Called before
 	 * {@link org.openqa.selenium.TakesScreenshot#getScreenshotAs(OutputType target)
 	 * getScreenshotAs(OutputType&lt;X&gt; target)}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param <X>     Return type for getScreenshotAs.
 	 * @param event   event record
 	 * @param target  target type, @see OutputType
 	 * @param element the WebElement being used for the action
 	 */
-	<X, T extends WebElement> void beforeGetScreenshotAsByElement(WebDriverEvent event, OutputType<X> target,
-			T element);
+	<X> void beforeGetScreenshotAsByElement(WebDriverEvent event, OutputType<X> target, WebElement element);
 
 	/**
 	 * Called after
 	 * {@link org.openqa.selenium.TakesScreenshot#getScreenshotAs(OutputType target)
 	 * getScreenshotAs(OutputType&lt;X&gt; target)}.
 	 * 
-	 * @param <T>        WebElement or any type extending WebElement to support
-	 *                   customized WebElement classes
 	 * @param <X>        Return type for getScreenshotAs.
 	 * @param event      event record
 	 * @param target     target type, @see OutputType
 	 * @param screenshot screenshot captured
 	 * @param element    the WebElement being used for the action
 	 */
-	<X, T extends WebElement> void afterGetScreenshotAsByElement(WebDriverEvent event, OutputType<X> target,
-			X screenshot, T element);
+	<X> void afterGetScreenshotAsByElement(WebDriverEvent event, OutputType<X> target, X screenshot,
+			WebElement element);
 
 	/**
 	 * Called before {@link WebElement#sendKeys WebElement.sendKeys(...)}.
 	 * 
-	 * @param <T>        WebElement or any type extending WebElement to support
-	 *                   customized WebElement classes
 	 * @param event      event record
 	 * @param element    the WebElement being used for the action
 	 * @param keysToSend text to insert
 	 */
-	<T extends WebElement> void beforeSendKeysByElement(WebDriverEvent event, T element, CharSequence... keysToSend);
+	void beforeSendKeysByElement(WebDriverEvent event, WebElement element, CharSequence... keysToSend);
 
 	/**
 	 * Called after {@link WebElement#sendKeys WebElement.sendKeys(...)}}. Not
 	 * called, if an exception is thrown.
 	 * 
-	 * @param <T>        WebElement or any type extending WebElement to support
-	 *                   customized WebElement classes
 	 * @param event      event record
 	 * @param element    the WebElement being used for the action
 	 * @param keysToSend text to insert
 	 */
-	<T extends WebElement> void afterSendKeysByElement(WebDriverEvent event, T element, CharSequence... keysToSend);
+	void afterSendKeysByElement(WebDriverEvent event, WebElement element, CharSequence... keysToSend);
 
 	/**
 	 * Called before {@link WebElement#sendKeys WebElement.sendKeys(...)} if the
 	 * keys to send are the name of a local file.
 	 * 
-	 * @param <T>       WebElement or any type extending WebElement to support
-	 *                  customized WebElement classes
 	 * @param event     event record
 	 * @param element   the WebElement being used for the action
 	 * @param localFile local file to upload
 	 */
-	<T extends WebElement> void beforeUploadFile(WebDriverEvent event, T element, File localFile);
+	void beforeUploadFile(WebDriverEvent event, WebElement element, File localFile);
 
 	/**
 	 * Called after {@link WebElement#sendKeys WebElement.sendKeys(...)}} if the
 	 * keys to send are the name of a local file. Not called, if an exception is
 	 * thrown.
 	 * 
-	 * @param <T>       WebElement or any type extending WebElement to support
-	 *                  customized WebElement classes
 	 * @param event     event record
 	 * @param element   the WebElement being used for the action
 	 * @param localFile local file to upload
 	 * @param response  response to file upload
 	 */
-	<T extends WebElement> void afterUploadFile(WebDriverEvent event, T element, File localFile, String response);
+	void afterUploadFile(WebDriverEvent event, WebElement element, File localFile, String response);
 
 	/**
 	 * Called before {@link WebElement#submit WebElement.submit()}.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void beforeSubmit(WebDriverEvent event, T element);
+	void beforeSubmit(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called after {@link WebElement#submit WebElement.submit()}. Not called, if an
 	 * exception is thrown.
 	 * 
-	 * @param <T>     WebElement or any type extending WebElement to support
-	 *                customized WebElement classes
 	 * @param event   event record
 	 * @param element the WebElement being used for the action
 	 */
-	<T extends WebElement> void afterSubmit(WebDriverEvent event, T element);
+	void afterSubmit(WebDriverEvent event, WebElement element);
 
 	/**
 	 * Called before {@link org.openqa.selenium.interactions.Keyboard#sendKeys
