@@ -13,7 +13,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
+import com.salesforce.cte.admin.TestAdvisorAdministrator;
 import com.salesforce.cte.common.JsonHelper;
 import com.salesforce.cte.listener.selenium.EventDispatcher;
 import com.salesforce.cte.listener.selenium.FullLogger;
@@ -86,6 +88,15 @@ public class TestEventDispatching {
 		we.click();
 		assertNumOfLogEntries("click", numOfEventsBefore, fullLogger.getListOfEventsRecorded().size(), 6);
 		assertNumOfLogEntries("click", numOfScreenshotEventsBefore, screenshotLogger.getListOfEventsRecorded().size(), 1);
+
+		TestAdvisorAdministrator administrator = TestAdvisorAdministrator.getInstance();
+		assertEquals(administrator.getTestCaseExecution().eventList.size(), 1);
+		assertEquals(administrator.getTestCaseExecution().eventList.get(0).getEventLevel(), Level.INFO.toString());
+		assertEquals(administrator.getTestCaseExecution().eventList.get(0).getSeleniumCmd(), "webElement.click");
+		assertEquals(administrator.getTestCaseExecution().eventList.get(0).getSeleniumLocator(), "By.id(\"someId\")");
+		assertEquals(administrator.getTestCaseExecution().eventList.get(0).getEventSource(), "com.salesforce.cte.listener.selenium.AbstractEventListener");
+		assertTrue(administrator.getTestCaseExecution().eventList.get(0).getScreenshotPath().contains("screenshot"));
+		assertTrue(administrator.getTestCaseExecution().eventList.get(0).getScreenshotRecordNumber()>=0);	
 	}
 	
 	@Test(priority = 2)
