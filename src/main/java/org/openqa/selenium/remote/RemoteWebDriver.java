@@ -98,7 +98,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 	private static final String BORDER_COLORING_POSTFIX = "'";
 	private static final String IGNORE_COMMAND_TAG = "testadvisor";
 
-	private EventDispatcher eventDispatcher = EventDispatcher.getInstance(this);
+	private EventDispatcher eventDispatcher = EventDispatcher.getInstance();
 
 	private static final Logger logger = Logger.getLogger(RemoteWebDriver.class.getName());
 	private Level level = Level.FINE;
@@ -146,6 +146,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 
 			throw e;
 		}
+		eventDispatcher.setWebDriver(this);
 	}
 
 	public RemoteWebDriver(URL remoteAddress, Capabilities capabilities) {
@@ -306,22 +307,24 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		return url;
 	}
 
+	@Override
 	public <X> X getScreenshotAs(OutputType<X> outputType) throws WebDriverException {
 		eventDispatcher.beforeGetScreenshotAs(outputType);
+		X screenshot = getScreenshotAsForTestAdvisor(outputType);
+		eventDispatcher.afterGetScreenshotAs(outputType, screenshot);
+		return screenshot;
+	}
+
+	public <X> X getScreenshotAsForTestAdvisor(OutputType<X> outputType) throws WebDriverException {
 		Response response = execute(DriverCommand.SCREENSHOT);
 		Object result = response.getValue();
 		if (result instanceof String) {
 			String base64EncodedPng = (String) result;
-			X screenshot = outputType.convertFromBase64Png(base64EncodedPng);
-			eventDispatcher.afterGetScreenshotAs(outputType, screenshot);
-			return screenshot;
+			return outputType.convertFromBase64Png(base64EncodedPng);
 		} else if (result instanceof byte[]) {
 			String base64EncodedPng = new String((byte[]) result);
-			X screenshot = outputType.convertFromBase64Png(base64EncodedPng);
-			eventDispatcher.afterGetScreenshotAs(outputType, screenshot);
-			return screenshot;
+			return outputType.convertFromBase64Png(base64EncodedPng);
 		} else {
-			eventDispatcher.afterGetScreenshotAs(outputType, null);
 			throw new RuntimeException(String.format("Unexpected result for %s command: %s", DriverCommand.SCREENSHOT,
 					result == null ? "null" : result.getClass().getName() + " instance"));
 		}
@@ -329,7 +332,7 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 
 	public List<WebElement> findElements(By by) {
 		eventDispatcher.beforeFindElementsByWebDriver(by);
-		List<WebElement> returnedElements = by.findElements(this);
+		List<WebElement> returnedElements = innerFindElements(by);
 		eventDispatcher.afterFindElementsByWebDriver(returnedElements, by);
 
 		for (WebElement element : returnedElements) {
@@ -337,6 +340,10 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		}
 
 		return returnedElements;
+	}
+
+	private List<WebElement> innerFindElements(By by) {
+		return by.findElements(this);
 	}
 
 	public WebElement findElement(By by) {
@@ -498,13 +505,18 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 	@SuppressWarnings({ "unchecked" })
 	public Set<String> getWindowHandles() {
 		eventDispatcher.beforeGetWindowHandles();
+		Set<String> handles = innerGetWindowHandles();
+		eventDispatcher.afterGetWindowHandles(handles);
+		return handles;
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	private Set<String> innerGetWindowHandles() {
 		Response response = execute(DriverCommand.GET_WINDOW_HANDLES);
 		Object value = response.getValue();
 		try {
 			List<String> returnedValues = (List<String>) value;
-			Set<String> handles = new LinkedHashSet<>(returnedValues);
-			eventDispatcher.afterGetWindowHandles(handles);
-			return handles;
+			return new LinkedHashSet<>(returnedValues);
 		} catch (ClassCastException ex) {
 			throw new WebDriverException("Returned value cannot be converted to List<String>: " + value, ex);
 		}
@@ -512,9 +524,13 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 
 	public String getWindowHandle() {
 		eventDispatcher.beforeGetWindowHandle();
-		String handle = String.valueOf(execute(DriverCommand.GET_CURRENT_WINDOW_HANDLE).getValue());
+		String handle = innerGetWindowHandle();
 		eventDispatcher.afterGetWindowHandle(handle);
 		return handle;
+	}
+
+	private String innerGetWindowHandle() {
+		return String.valueOf(execute(DriverCommand.GET_CURRENT_WINDOW_HANDLE).getValue());
 	}
 
 	public Object executeScript(String script, Object... args) {
@@ -980,9 +996,9 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 		public WebDriver frame(String frameName) {
 			String name = frameName.replaceAll("(['\"\\\\#.:;,!?+<>=~*^$|%&@`{}\\-/\\[\\]\\(\\)])", "\\\\$1");
 			List<WebElement> frameElements = RemoteWebDriver.this
-					.findElements(By.cssSelector("frame[name='" + name + "'],iframe[name='" + name + "']"));
+					.innerFindElements(By.cssSelector("frame[name='" + name + "'],iframe[name='" + name + "']"));
 			if (frameElements.size() == 0) {
-				frameElements = RemoteWebDriver.this.findElements(By.cssSelector("frame#" + name + ",iframe#" + name));
+				frameElements = RemoteWebDriver.this.innerFindElements(By.cssSelector("frame#" + name + ",iframe#" + name));
 			}
 			if (frameElements.size() == 0) {
 				throw new NoSuchFrameException("No frame element found by name or id " + frameName);
@@ -1013,8 +1029,8 @@ public class RemoteWebDriver implements WebDriver, JavascriptExecutor, FindsById
 				return RemoteWebDriver.this;
 			} catch (NoSuchWindowException nsw) {
 				// simulate search by name
-				String original = getWindowHandle();
-				for (String handle : getWindowHandles()) {
+				String original = innerGetWindowHandle();
+				for (String handle : innerGetWindowHandles()) {
 					switchTo().window(handle);
 					if (windowHandleOrName.equals(executeScript("return window.name"))) {
 						eventDispatcher.afterWindow(windowHandleOrName);

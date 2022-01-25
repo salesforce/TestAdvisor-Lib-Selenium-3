@@ -53,7 +53,7 @@ public interface IEventListener {
 	 * Location of logfiles produced by Test Drop-in Framework and its dependent
 	 * classes: {@value}
 	 */
-	final String TEST_ADVISOR_LOGFILES_DIR = "target/";
+	String TEST_ADVISOR_LOGFILES_DIR = "target/";
 
 	/*--------------------------------------------------------------------
 	 * Section for all commands called directly from WebDriver object.
@@ -713,20 +713,34 @@ public interface IEventListener {
 	void afterFrameByIndex(WebDriverEvent event, int frameIndex);
 
 	/**
-	 * Called before {@link WebDriver.TargetLocator#frame(WebElement)
-	 * TargetLocator.frame(webElement)} or
-	 * {@link WebDriver.TargetLocator#frame(String) TargetLocator.frame(name)}.
-	 * 
+	 * Called before {@link WebDriver.TargetLocator#frame(String) TargetLocator.frame(frameName)}
+	 * @param event
+	 *            event record
+	 * @param frameName
+	 *            name of frame
+	 */
+	void beforeFrameByName(WebDriverEvent event, String frameName);
+
+	/**
+	 * Called after {@link WebDriver.TargetLocator#frame(String) TargetLocator.frame(frameName)}
+	 * Not called, if an exception is thrown.
+	 * @param event
+	 *            event record
+	 * @param frameName
+	 *            name of frame
+	 */
+	void afterFrameByName(WebDriverEvent event, String frameName);
+
+	/**
+	 * Called before {@link WebDriver.TargetLocator#frame(WebElement) TargetLocator.frame(webElement)}.
 	 * @param event        event record
 	 * @param frameElement element inside frame
 	 */
 	void beforeFrameByElement(WebDriverEvent event, WebElement frameElement);
 
 	/**
-	 * Called after {@link WebDriver.TargetLocator#frame(WebElement)
-	 * TargetLocator.frame(webElement)} or
-	 * {@link WebDriver.TargetLocator#frame(String) TargetLocator.frame(name)}. Not
-	 * called, if an exception is thrown.
+	 * Called after {@link WebDriver.TargetLocator#frame(WebElement) TargetLocator.frame(webElement)}.
+	 * Not called, if an exception is thrown.
 	 * 
 	 * @param event        event record
 	 * @param frameElement element inside frame
