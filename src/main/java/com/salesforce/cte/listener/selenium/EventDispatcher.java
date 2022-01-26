@@ -8,25 +8,15 @@
 package com.salesforce.cte.listener.selenium;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Coordinates;
 
 import com.salesforce.cte.listener.selenium.WebDriverEvent.Cmd;
 import com.salesforce.cte.listener.selenium.WebDriverEvent.Type;
+import org.openqa.selenium.remote.RemoteWebElement;
 
 /**
  * Entry point for all WebDriver classes augmented by us to fit Test Advisor's
@@ -42,17 +32,15 @@ public class EventDispatcher {
 	private WebDriverEvent currentEvent = null;
 	private int eventNumber = 0;
 
-	public static EventDispatcher getInstance(WebDriver driver) {
+	public static EventDispatcher getInstance() {
 		if (instance == null)
-			instance = new EventDispatcher(driver);
-		if (driver != null)
-			instance.setWebDriver(driver);
+			instance = new EventDispatcher();
 		return instance;
 	}
 
-	private EventDispatcher(WebDriver driver) {
+	private EventDispatcher() {
 		eventListeners.add(new FullLogger());
-		eventListeners.add(new ScreenshotLogger(driver));
+		eventListeners.add(new ScreenshotLogger());
 	}
 
 	public void setWebDriver(WebDriver driver) {
@@ -237,15 +225,7 @@ public class EventDispatcher {
 	public void beforeExecuteScript(String script, Map<String, ?> params) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.executeScript);
 		event.setParam1(script);
-		if (!params.isEmpty()) {
-			Set<String> arguments = params.keySet();
-			StringBuilder b = new StringBuilder();
-			for (String arg : arguments)
-				b.append(arg).append(",");
-			String param2 = b.toString();
-			// drop the trailing ','
-			event.setParam2(param2.substring(0, param2.length() - 1));
-		}
+		event.setParam2(printArgs(params));
 		currentEvent = event;
 		for (IEventListener listener : eventListeners)
 			listener.beforeExecuteScript(event, script, params);
@@ -254,15 +234,7 @@ public class EventDispatcher {
 	public void afterExecuteScript(String script, Map<String, ?> params, Object result) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.executeScript);
 		event.setParam1(script);
-		if (!params.isEmpty()) {
-			Set<String> arguments = params.keySet();
-			StringBuilder b = new StringBuilder();
-			for (String arg : arguments)
-				b.append(arg).append(",");
-			String param2 = b.toString();
-			// drop the trailing ','
-			event.setParam2(param2.substring(0, param2.length() - 1));
-		}
+		event.setParam2(printArgs(params));
 		event.setReturnObject(result);
 		for (IEventListener listener : eventListeners)
 			listener.afterExecuteScript(event, script, params, result);
@@ -271,15 +243,7 @@ public class EventDispatcher {
 	public void beforeExecuteAsyncScript(String script, Map<String, ?> params) {
 		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.executeAsyncScript);
 		event.setParam1(script);
-		if (!params.isEmpty()) {
-			Set<String> arguments = params.keySet();
-			StringBuilder b = new StringBuilder();
-			for (String arg : arguments)
-				b.append(arg).append(",");
-			String param2 = b.toString();
-			// drop the trailing ','
-			event.setParam2(param2.substring(0, param2.length() - 1));
-		}
+		event.setParam2(printArgs(params));
 		currentEvent = event;
 		for (IEventListener listener : eventListeners)
 			listener.beforeExecuteAsyncScript(event, script, params);
@@ -288,18 +252,39 @@ public class EventDispatcher {
 	public void afterExecuteAsyncScript(String script, Map<String, ?> params, Object result) {
 		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.executeAsyncScript);
 		event.setParam1(script);
-		if (!params.isEmpty()) {
-			Set<String> arguments = params.keySet();
-			StringBuilder b = new StringBuilder();
-			for (String arg : arguments)
-				b.append(arg).append(",");
-			String param2 = b.toString();
-			// drop the trailing ','
-			event.setParam2(param2.substring(0, param2.length() - 1));
-		}
+		event.setParam2(printArgs(params));
 		event.setReturnObject(result);
 		for (IEventListener listener : eventListeners)
 			listener.afterExecuteAsyncScript(event, script, params, result);
+	}
+
+	private String printArgs(Map<String, ?> params) {
+		if (params.isEmpty())
+			return null;
+
+		StringBuilder b = new StringBuilder();
+		for (String key : params.keySet()) {
+			Object o = params.get(key);
+			if (o instanceof String)
+				b.append((String) o).append(",");
+			else if (o instanceof Boolean)
+				b.append(o).append(",");
+			else if (o instanceof Number)
+				b.append(o).append(",");
+			else {
+				while (o instanceof WrapsElement) {
+					o = ((WrapsElement) o).getWrappedElement();
+				}
+				if (o instanceof RemoteWebElement)
+					b.append(o).append(",");
+				else
+					// for now we are not drilling deeper
+					b.append(o);
+			}
+		}
+		String param2 = b.toString();
+		// return without the trailing ','
+		return param2.substring(0, param2.length()-1);
 	}
 
 	public void beforeAddCookie(Cookie cookie) {
@@ -664,6 +649,21 @@ public class EventDispatcher {
 		event.setParam1("" + frameIndex);
 		for (IEventListener listener : eventListeners)
 			listener.afterFrameByIndex(event, frameIndex);
+	}
+
+	public void beforeFrameByName(String frameName) {
+		WebDriverEvent event = new WebDriverEvent(Type.BeforeAction, eventNumber, Cmd.frameByElement);
+		event.setParam1(frameName);
+		currentEvent = event;
+		for (IEventListener listener : eventListeners)
+			listener.beforeFrameByName(event, frameName);
+	}
+
+	public void afterFrameByName(String frameName) {
+		WebDriverEvent event = new WebDriverEvent(Type.AfterAction, eventNumber++, Cmd.frameByElement);
+		event.setParam1(frameName);
+		for (IEventListener listener : eventListeners)
+			listener.afterFrameByName(event, frameName);
 	}
 
 	public void beforeFrameByElement(WebElement frameElement) {
@@ -1298,9 +1298,7 @@ public class EventDispatcher {
 	}
 
 	private String charSequence2String(CharSequence... charSequence) {
-		final StringBuilder sb = new StringBuilder(charSequence.length);
-		sb.append(charSequence);
-		return sb.toString();
+		return Arrays.toString(charSequence);
 	}
 
 	private String getCoordinatesAsString(Coordinates where) {

@@ -8,8 +8,12 @@
 package com.salesforce.cte.listener.selenium;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import com.salesforce.cte.admin.TestAdvisorConfiguration;
 import com.salesforce.cte.common.TestEvent;
@@ -18,18 +22,23 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class ScreenshotLogger extends AbstractEventListener {
 	private ThreadLocal<String> cachedSendKeysLocator = new ThreadLocal<>();
     
     private TakesScreenshot tss;
-    
-    public ScreenshotLogger(WebDriver driver){
-        this.tss = (TakesScreenshot)driver;
-    }
+	private RemoteWebDriver rwd;
 
 	public void setWebDriver(WebDriver driver){
-		this.tss = (TakesScreenshot)driver;
+		if (driver instanceof RemoteWebDriver) {
+			List<Method> methods = Arrays.stream(RemoteWebDriver.class.getMethods()).filter(m -> m.getName().equals("getScreenshotAsForTestAdvisor")).
+					collect(Collectors.toList());
+			if (methods.isEmpty())
+				this.tss = (TakesScreenshot) driver;
+			else
+				this.rwd = (RemoteWebDriver) driver;
+		}
 	}
 	
     /*--------------------------------------------------------------------
@@ -119,7 +128,11 @@ public class ScreenshotLogger extends AbstractEventListener {
     private void captureScreenShot(WebDriverEvent event){
         logEntries.add(event);
 		if (TestAdvisorConfiguration.getIsScreenshotCaptureEnabled()){
-			File file=tss.getScreenshotAs(OutputType.FILE);
+			File file = null;
+			if (rwd != null)
+				file = rwd.getScreenshotAsForTestAdvisor(OutputType.FILE);
+			else
+				file = tss.getScreenshotAs(OutputType.FILE);
 			TestEvent testEvent = createTestEvent(event,Level.INFO);
 			testEvent.setStreenshotPath(file.getAbsolutePath());
 			administrator.getTestCaseExecution().appendEvent(testEvent);

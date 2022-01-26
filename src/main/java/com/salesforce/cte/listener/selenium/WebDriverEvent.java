@@ -123,7 +123,7 @@ public class WebDriverEvent {
 		mouseMoveWithOffset(WebDriverInterface.Mouse, "mouseMove"),
 		contextClick(WebDriverInterface.Mouse, "contextClick");
 
-		private Cmd(WebDriverInterface wdIf, String shortCmdString) {
+		Cmd(WebDriverInterface wdIf, String shortCmdString) {
 			this.wdIf = wdIf;
 			this.shortCmdString = shortCmdString;
 		}
@@ -133,10 +133,6 @@ public class WebDriverEvent {
 
 		public String getShortCmdString() {
 			return this.shortCmdString;
-		}
-
-		public WebDriverInterface getWebDriverInterface() {
-			return this.wdIf;
 		}
 
 		public String getLongCmdString() {

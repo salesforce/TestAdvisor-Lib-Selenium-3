@@ -57,12 +57,14 @@ import java.util.Map;
 public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById, FindsByName, FindsByTagName,
 		FindsByClassName, FindsByCssSelector, FindsByXPath, WrapsDriver, HasIdentity, TakesScreenshot,
 		Locatable {
+	private static final String RETURNED_VALUE_CANNOT_BE_CONVERTED_TO_BOOLEAN = "Returned value cannot be converted to Boolean: ";
+
 	private String foundBy;
 	protected String id;
 	protected RemoteWebDriver parent;
 	protected FileDetector fileDetector;
 
-	private EventDispatcher eventDispatcher = EventDispatcher.getInstance(parent);
+	private final EventDispatcher eventDispatcher = EventDispatcher.getInstance();
 
 	protected void setFoundBy(SearchContext foundFrom, String locator, String term) {
 		this.foundBy = String.format("[%s] -> %s: %s", foundFrom, locator, term);
@@ -169,7 +171,7 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
 			eventDispatcher.afterIsSelected(boolValue, this);
 			return boolValue;
 		} catch (ClassCastException ex) {
-			throw new WebDriverException("Returned value cannot be converted to Boolean: " + value, ex);
+			throw new WebDriverException(RETURNED_VALUE_CANNOT_BE_CONVERTED_TO_BOOLEAN + value, ex);
 		}
 	}
 
@@ -181,7 +183,7 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
 			eventDispatcher.afterIsEnabled(boolValue, this);
 			return boolValue;
 		} catch (ClassCastException ex) {
-			throw new WebDriverException("Returned value cannot be converted to Boolean: " + value, ex);
+			throw new WebDriverException(RETURNED_VALUE_CANNOT_BE_CONVERTED_TO_BOOLEAN + value, ex);
 		}
 	}
 
@@ -198,7 +200,7 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
 		Response response = execute(DriverCommand.GET_ELEMENT_VALUE_OF_CSS_PROPERTY,
 				ImmutableMap.of("id", id, "propertyName", propertyName));
 		String value = (String) response.getValue();
-		eventDispatcher.afterGetText(value, this);
+		eventDispatcher.afterGetCssValue(propertyName, value, this);
 		return value;
 	}
 
@@ -236,7 +238,7 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
 		try {
 			element = (WebElement) responseValue;
 		} catch (ClassCastException ex) {
-			throw new WebDriverException("Returned value cannot be converted to WebElement: " + value, ex);
+			throw new WebDriverException(RETURNED_VALUE_CANNOT_BE_CONVERTED_TO_BOOLEAN + value, ex);
 		}
 		parent.setFoundBy(this, element, using, value);
 		return element;
@@ -374,20 +376,24 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
 			eventDispatcher.afterIsDisplayed(boolValue, this);
 			return boolValue;
 		} catch (ClassCastException ex) {
-			throw new WebDriverException("Returned value cannot be converted to Boolean: " + value, ex);
+			throw new WebDriverException(RETURNED_VALUE_CANNOT_BE_CONVERTED_TO_BOOLEAN + value, ex);
 		}
 	}
 
 	@SuppressWarnings({ "unchecked" })
 	public Point getLocation() {
 		eventDispatcher.beforeGetLocation(this);
+		Point point = innerGetLocation();
+		eventDispatcher.afterGetLocation(point, this);
+		return point;
+	}
+
+	private Point innerGetLocation() {
 		Response response = execute(DriverCommand.GET_ELEMENT_LOCATION, ImmutableMap.of("id", id));
 		Map<String, Object> rawPoint = (Map<String, Object>) response.getValue();
 		int x = ((Number) rawPoint.get("x")).intValue();
 		int y = ((Number) rawPoint.get("y")).intValue();
-		Point point = new Point(x, y);
-		eventDispatcher.afterGetLocation(point, this);
-		return point;
+		return new Point(x, y);
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -433,7 +439,7 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
 			}
 
 			public Point onPage() {
-				return getLocation();
+				return innerGetLocation();
 			}
 
 			public Object getAuxiliary() {
@@ -447,20 +453,21 @@ public class RemoteWebElement implements WebElement, FindsByLinkText, FindsById,
 	@Beta
 	public <X> X getScreenshotAs(OutputType<X> outputType) throws WebDriverException {
 		eventDispatcher.beforeGetScreenshotAsByElement(outputType, this);
+		X screenshot = getScreenshotAsForTestAdvisor(outputType);
+		eventDispatcher.afterGetScreenshotAsByElement(outputType, screenshot, this);
+		return screenshot;
+	}
+
+	public <X> X getScreenshotAsForTestAdvisor(OutputType<X> outputType) throws WebDriverException {
 		Response response = execute(DriverCommand.ELEMENT_SCREENSHOT, ImmutableMap.of("id", id));
 		Object result = response.getValue();
 		if (result instanceof String) {
 			String base64EncodedPng = (String) result;
-			X screenshot = outputType.convertFromBase64Png(base64EncodedPng);
-			eventDispatcher.afterGetScreenshotAsByElement(outputType, screenshot, this);
-			return screenshot;
+			return outputType.convertFromBase64Png(base64EncodedPng);
 		} else if (result instanceof byte[]) {
 			String base64EncodedPng = new String((byte[]) result);
-			X screenshot = outputType.convertFromBase64Png(base64EncodedPng);
-			eventDispatcher.afterGetScreenshotAsByElement(outputType, screenshot, this);
-			return screenshot;
+			return outputType.convertFromBase64Png(base64EncodedPng);
 		} else {
-			eventDispatcher.afterGetScreenshotAsByElement(outputType, null, this);
 			throw new RuntimeException(
 					String.format("Unexpected result for %s command: %s", DriverCommand.ELEMENT_SCREENSHOT,
 							result == null ? "null" : result.getClass().getName() + " instance"));
