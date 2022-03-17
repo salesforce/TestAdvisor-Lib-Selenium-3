@@ -31,12 +31,14 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Coordinates;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.salesforce.cte.admin.TestAdvisorAdministrator;
 import com.salesforce.cte.common.TestEvent;
+import com.salesforce.cte.common.TestEventType;
 import com.salesforce.cte.listener.selenium.WebDriverEvent.Cmd;
 
 /**
@@ -55,7 +57,11 @@ public abstract class AbstractEventListener implements IEventListener {
 	@JsonProperty("logEntries")
 	protected List<WebDriverEvent> logEntries = new ArrayList<>();
 	protected TestAdvisorAdministrator administrator = TestAdvisorAdministrator.getInstance();
+    protected ThreadLocal<String> cachedSendKeysLocator = new ThreadLocal<>();
 
+    public void setWebDriver(WebDriver driver){
+	}
+    
 	/*--------------------------------------------------------------------
 	 * Section for all commands called directly from WebDriver object.
 	 *--------------------------------------------------------------------*/
@@ -734,14 +740,36 @@ public abstract class AbstractEventListener implements IEventListener {
 		return null;
 	}
 
-	protected TestEvent createTestEvent(WebDriverEvent event, Level eventLevel) {
+	protected TestEvent createTestEvent(TestEventType eventType, WebDriverEvent event, Level eventLevel) {
 		String param1 = event.getParam1() == null ? "" : event.getParam1();
 		String param2 = event.getParam2() == null ? "" : event.getParam2();
 		String cmd = event.getCmd().getLongCmdString();
 		cmd = cmd == null ? "" : cmd;
 		String locator = event.getElementLocator();
 		locator = locator == null ? "" : locator;
-		return new TestEvent(event.toString(), eventLevel.toString(), cmd, param1 + param2, locator,
+		return new TestEvent(eventType, event.toString(), eventLevel.toString(), cmd, param1 + param2, locator,
 				event.getRecordNumber(), null);
 	}
+
+    protected boolean isDifferentLocator(WebElement elem) {
+    	String locator = WebDriverEvent.getLocatorFromWebElement(elem);
+    	// if locator is null we assume it's a different locator
+    	if (locator == null)
+    		return true;
+    	
+    	String cachedLocator = cachedSendKeysLocator.get();
+    	// if cachedLocator is null we assume it's a different locator
+    	if (cachedLocator == null) {
+    		// cache the currently used locator
+    		cachedSendKeysLocator.set(locator);
+    		return true;    		
+    	}
+
+    	if (cachedLocator.equals(locator))
+    		return false;
+    	
+    	// currently used locator is different from cached one; replace the cached locator
+    	cachedSendKeysLocator.set(locator);
+    	return true;
+    }
 }

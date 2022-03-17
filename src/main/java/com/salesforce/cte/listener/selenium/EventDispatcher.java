@@ -39,15 +39,14 @@ public class EventDispatcher {
 	}
 
 	private EventDispatcher() {
-		eventListeners.add(new FullLogger());
-		eventListeners.add(new ScreenshotLogger());
+		eventListeners.add(new FullListener());
+		eventListeners.add(new ScreenshotListener());
+        eventListeners.add(new TestStepListener());
 	}
 
 	public void setWebDriver(WebDriver driver) {
 		for (IEventListener listener : eventListeners) {
-			if (listener instanceof ScreenshotLogger) {
-				((ScreenshotLogger) listener).setWebDriver(driver);
-			}
+            ((AbstractEventListener) listener).setWebDriver(driver);
 		}
 	}
 
