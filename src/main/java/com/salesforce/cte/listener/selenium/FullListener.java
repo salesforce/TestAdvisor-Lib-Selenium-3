@@ -23,6 +23,7 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Coordinates;
 
+import com.salesforce.cte.common.TestEventType;
 import com.salesforce.cte.listener.selenium.WebDriverEvent.Cmd;
 
 /**
@@ -42,7 +43,7 @@ import com.salesforce.cte.listener.selenium.WebDriverEvent.Cmd;
  * @author gneumann
  * @since 1.0
  */
-public class FullLogger extends AbstractEventListener {
+public class FullListener extends AbstractEventListener {
 	/*--------------------------------------------------------------------
 	 * Section for all commands called directly from WebDriver object.
 	 *--------------------------------------------------------------------*/
@@ -806,7 +807,7 @@ public class FullLogger extends AbstractEventListener {
 	@Override
 	public void onException(WebDriverEvent event, Cmd cmd, Throwable issue) {
 		logEntries.add(event);
-		administrator.getTestCaseExecution().appendEvent(createTestEvent(event, Level.WARNING));
+		administrator.getTestCaseExecution().appendEvent(createTestEvent(TestEventType.EXCEPTION, event, Level.WARNING));
 	}
 
 	// This listener provides the events in the way defined in
