@@ -11,6 +11,7 @@
 	<version>0.2.15-SNAPSHOT</version>
 	<name>Selenium 3 support for Test Advisor Library</name>
 	<description>A Selenium 3 based UI test library to generate enhanced test logs</description>
+	<url>http://www.salesforce.com/</url>
 	<packaging>jar</packaging>
 
 	<licenses>
